@@ -252,54 +252,116 @@ const getAllSellers = async (req, res) => {
 // APPROVE SELLER
 // =====================================
 
+// const approveSeller = async (req, res) => {
+//     try {
+
+//         const { sellerId } = req.params;
+
+//         const seller =
+//             await Seller.findById(
+//                 sellerId
+//             );
+
+//         if (!seller) {
+//             return res.status(404).json({
+//                 message: "Seller not found"
+//             });
+//         }
+
+//         if (seller.isApproved) {
+//             return res.status(400).json({
+//                 message:
+//                     "Seller is already approved"
+//             });
+//         }
+
+//         seller.isApproved = true;
+
+//         await seller.save();
+
+//         res.status(200).json({
+
+//             message:
+//                 "Seller approved successfully",
+
+//             sellerId:
+//                 seller._id
+//         });
+
+//     } catch (error) {
+
+//         console.error(
+//             "Approve Seller Error:",
+//             error
+//         );
+
+//         res.status(500).json({
+//             message: "Server error"
+//         });
+//     }
+// };
+
+
+
+
+
+
+
+
+
+
+
 const approveSeller = async (req, res) => {
-    try {
+    try {
+        const { sellerId } = req.params;
 
-        const { sellerId } = req.params;
+        console.log("====================================");
+        console.log("Approve request for seller:", sellerId);
 
-        const seller =
-            await Seller.findById(
-                sellerId
-            );
+        const seller = await Seller.findById(sellerId);
 
-        if (!seller) {
-            return res.status(404).json({
-                message: "Seller not found"
-            });
-        }
+        console.log("Seller found:", seller);
 
-        if (seller.isApproved) {
-            return res.status(400).json({
-                message:
-                    "Seller is already approved"
-            });
-        }
+        if (!seller) {
+            return res.status(404).json({
+                message: "Seller not found"
+            });
+        }
 
-        seller.isApproved = true;
+        console.log("Seller Object:", seller.toObject());
 
-        await seller.save();
+        if (seller.isApproved) {
+            return res.status(400).json({
+                message: "Seller is already approved"
+            });
+        }
 
-        res.status(200).json({
+        seller.isApproved = true;
 
-            message:
-                "Seller approved successfully",
+        console.log("Before save:", seller);
 
-            sellerId:
-                seller._id
-        });
+        await seller.save();
 
-    } catch (error) {
+        console.log("Seller approved successfully");
 
-        console.error(
-            "Approve Seller Error:",
-            error
-        );
+        res.status(200).json({
+            message: "Seller approved successfully",
+            sellerId: seller._id
+        });
 
-        res.status(500).json({
-            message: "Server error"
-        });
-    }
+    } catch (error) {
+        console.error("Approve Seller Error:", error);
+
+        res.status(500).json({
+            message: "Server error",
+            error: error.message
+        });
+    }
 };
+
+
+
+
 
 
 // =====================================
