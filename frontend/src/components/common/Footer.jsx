@@ -235,7 +235,7 @@ const Footer = () => {
                 href="mailto:skyrani40@gmail.com" 
                 className="text-xs text-emerald-400 hover:text-emerald-300 font-semibold block transition break-all"
               >
-                ✉️ mailto:skyrani40@gmail.com
+                ✉️ skyrani40@gmail.com
               </a>
             </div>
 
