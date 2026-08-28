@@ -1,474 +1,4 @@
 
-// const express = require("express");
-// const http = require("http");
-// const { Server } = require("socket.io");
-
-// const app = express();
-
-// const dotenv = require("dotenv").config();
-// const cors = require("cors");
-// const cookieParser = require("cookie-parser");
-
-// const PORT = process.env.PORT || 4000;
-
-// // =======================
-// // Database
-// // =======================
-
-// const db = require("./config/db");
-
-// // =======================
-// // Routes
-// // =======================
-
-// const userRoutes = require("./route/userRoutes");
-// const sellerRoutes = require("./route/sellerRoutes");
-// const sellerProductRoutes = require("./route/sellerProductRoutes");
-// const deliveryBoyRoutes = require("./route/deliveryRoutes");
-// const productRoutes = require("./route/productRoutes");
-// const cartRoutes = require("./route/cartRoutes");
-// const adminRoutes = require("./route/adminRoutes");
-// const orderRoutes = require("./route/orderRoutes");
-// const paymentRoutes = require("./route/paymentRoutes");
-
-
-
-// // =======================
-// // Middleware
-// // =======================
-
-// app.use(
-//     cors({
-//         origin:[ "http://localhost:5173",
-//                   "http://localhost:3000",
-//                   "http://127.0.0.1:5173"
-//         ],
-//         credentials: true,
-//         methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-//         allowedHeaders: ["Content-Type", "Authorization"]
-//     })
-// );
-
-// app.use(express.json());
-
-// app.use(cookieParser());
-
-
-// // =======================
-// // Normal Route
-// // =======================
-
-// app.get("/", (req, res) => {
-//     res.send("hello server");
-// });
-
-
-// // =======================
-// // API Routes
-// // =======================
-
-// app.use("/api/user", userRoutes);
-
-// app.use("/api/seller", sellerRoutes);
-
-// app.use(
-//     "/api/seller/products",
-//     sellerProductRoutes
-// );
-
-// app.use(
-//     "/api/delivery-boy",
-//     deliveryBoyRoutes
-// );
-
-// app.use(
-//     "/api/products",
-//     productRoutes
-// );
-
-// app.use(
-//     "/api/cart",
-//     cartRoutes
-// );
-
-// app.use(
-//     "/api/admin",
-//     adminRoutes
-// );
-
-// app.use(
-//     "/api/orders",
-//     orderRoutes
-// );
-
-// app.use("/api/payment", paymentRoutes);
-
-
-// // =======================
-// // HTTP Server
-// // =======================
-
-// const server = http.createServer(app);
-
-
-// // =======================
-// // Socket.IO
-// // =======================
-
-// const io = new Server(server, {
-//     cors: {
-//         origin: "http://localhost:5173",
-//         credentials: true,
-//     },
-// });
-
-
-// // =======================
-// // Set Socket.IO Instance
-// // =======================
-
-// require("./config/socket").setIO(io);
-
-
-// // =======================
-// // Socket Connection
-// // =======================
-
-// io.on("connection", (socket) => {
-
-//     console.log(
-//         "Socket connected:",
-//         socket.id
-//     );
-
-
-//     // =======================
-//     // CUSTOMER ROOM
-//     // =======================
-
-//     socket.on(
-//         "joinCustomer",
-//         (customerId) => {
-
-//             if (!customerId) {
-//                 return;
-//             }
-
-//             socket.join(
-//                 `customer_${customerId}`
-//             );
-
-//             console.log(
-//                 `Customer joined room: customer_${customerId}`
-//             );
-//         }
-//     );
-
-
-//     // =======================
-//     // SELLER ROOM
-//     // =======================
-
-//     socket.on(
-//         "joinSeller",
-//         (sellerId) => {
-
-//             if (!sellerId) {
-//                 return;
-//             }
-
-//             socket.join(
-//                 `seller_${sellerId}`
-//             );
-
-//             console.log(
-//                 `Seller joined room: seller_${sellerId}`
-//             );
-//         }
-//     );
-
-
-//     // =======================
-//     // DELIVERY BOY ROOM
-//     // =======================
-
-//     socket.on(
-//         "joinDeliveryBoy",
-//         (deliveryBoyId) => {
-
-//             if (!deliveryBoyId) {
-//                 return;
-//             }
-
-//             socket.join(
-//                 `deliveryBoy_${deliveryBoyId}`
-//             );
-
-//             console.log(
-//                 `Delivery boy joined room: deliveryBoy_${deliveryBoyId}`
-//             );
-//         }
-//     );
-
-
-//     // =======================
-//     // SOCKET DISCONNECT
-//     // =======================
-
-//     socket.on("disconnect", () => {
-
-//         console.log(
-//             "Socket disconnected:",
-//             socket.id
-//         );
-
-//     });
-
-// });
-
-
-// // =======================
-// // Start Server
-// // =======================
-
-// server.listen(PORT, () => {
-
-//     console.log(
-//         `server running on http://localhost:${PORT}`
-//     );
-
-// });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// const express = require("express");
-// const http = require("http");
-// const { Server } = require("socket.io");
-
-// const app = express();
-
-// require("dotenv").config();
-// const cors = require("cors");
-// const cookieParser = require("cookie-parser");
-
-// // ব্যাকএন্ড পোর্ট ৩০০০ সেট করা হলো
-// const PORT = process.env.PORT || 3000;
-
-// // =======================
-// // Database
-// // =======================
-
-// const db = require("./config/db");
-
-// // =======================
-// // Routes
-// // =======================
-
-// const userRoutes = require("./route/userRoutes");
-// const sellerRoutes = require("./route/sellerRoutes");
-// const sellerProductRoutes = require("./route/sellerProductRoutes");
-// const deliveryBoyRoutes = require("./route/deliveryRoutes");
-// const productRoutes = require("./route/productRoutes");
-// const cartRoutes = require("./route/cartRoutes");
-// const adminRoutes = require("./route/adminRoutes");
-// const orderRoutes = require("./route/orderRoutes");
-// const paymentRoutes = require("./route/paymentRoutes");
-
-// // =======================
-// // Middleware
-// // =======================
-
-// app.use(
-//   cors({
-//     origin: [
-//       "http://localhost:5173",
-//       "http://localhost:3000",
-//       "http://127.0.0.1:5173",
-//     ],
-//     credentials: true,
-//     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-//     allowedHeaders: ["Content-Type", "Authorization"],
-//   })
-// );
-
-// app.use(express.json());
-// app.use(cookieParser());
-
-// // =======================
-// // Normal Route
-// // =======================
-
-// app.get("/", (req, res) => {
-//   res.send("hello server");
-// });
-
-// // =======================
-// // API Routes
-// // =======================
-
-// app.use("/api/user", userRoutes);
-// app.use("/api/seller", sellerRoutes);
-// app.use("/api/seller/products", sellerProductRoutes);
-// app.use("/api/delivery-boy", deliveryBoyRoutes);
-// app.use("/api/products", productRoutes);
-// app.use("/api/cart", cartRoutes);
-// app.use("/api/admin", adminRoutes);
-// app.use("/api/orders", orderRoutes);
-// app.use("/api/payment", paymentRoutes);
-
-// // =======================
-// // HTTP Server
-// // =======================
-
-// const server = http.createServer(app);
-
-// // =======================
-// // Socket.IO Setup
-// // =======================
-
-// const io = new Server(server, {
-//   cors: {
-//     origin: [
-//       "http://localhost:5173",
-//       "http://localhost:3000",
-//       "http://127.0.0.1:5173",
-//     ],
-//     credentials: true,
-//     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-//   },
-//   transports: ["polling", "websocket"],
-// });
-
-// // =======================
-// // Set Socket.IO Instance
-// // =======================
-
-// require("./config/socket").setIO(io);
-
-// // =======================
-// // Socket Connection & Event Handlers
-// // =======================
-
-// io.on("connection", (socket) => {
-//   console.log("⚡ Socket connected:", socket.id);
-
-//   // =======================
-//   // CUSTOMER ROOM
-//   // =======================
-//   socket.on("joinCustomer", (customerId) => {
-//     if (!customerId) return;
-//     socket.join(`customer_${customerId}`);
-//     console.log(`👤 Customer joined room: customer_${customerId}`);
-//   });
-
-//   // =======================
-//   // SELLER ROOM
-//   // =======================
-//   socket.on("joinSeller", (sellerId) => {
-//     if (!sellerId) return;
-//     socket.join(`seller_${sellerId}`);
-//     console.log(`🏪 Seller joined room: seller_${sellerId}`);
-//   });
-
-//   // =======================
-//   // DELIVERY BOY ROOM
-//   // =======================
-//   socket.on("joinDeliveryBoy", (deliveryBoyId) => {
-//     if (!deliveryBoyId) return;
-//     socket.join(`deliveryBoy_${deliveryBoyId}`);
-//     console.log(`🛵 Delivery boy joined room: deliveryBoy_${deliveryBoyId}`);
-//   });
-
-//   // =======================
-//   // DIRECT ORDER TRIGGER (Backup Notification)
-//   // =======================
-//   socket.on("orderPlacedTrigger", (data) => {
-//     console.log("⚡ Order Placed Trigger Received:", data);
-//     if (data.sellerId) {
-//       io.to(`seller_${data.sellerId}`).emit("newOrderAlert", data);
-//       io.to(`seller_${data.sellerId}`).emit("new_order_notification", data);
-//     }
-//     io.emit("globalNewOrder", data);
-//   });
-
-//   // =======================
-//   // SOCKET DISCONNECT
-//   // =======================
-//   socket.on("disconnect", () => {
-//     console.log("❌ Socket disconnected:", socket.id);
-//   });
-// });
-
-// // =======================
-// // Start Server
-// // =======================
-
-// server.listen(PORT, () => {
-//   console.log(`Server running on http://localhost:${PORT}`);
-// });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 const express = require("express");
 const http = require("http");
 const { Server } = require("socket.io");
@@ -502,18 +32,36 @@ const paymentRoutes = require("./route/paymentRoutes");
 // =======================
 // Middleware
 // =======================
+// app.use(
+//   cors({
+//     origin: [
+//       "http://localhost:5173",
+//       "http://localhost:3000",
+//       "http://127.0.0.1:5173",
+//     ],
+//     credentials: true,
+//     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+//     allowedHeaders: ["Content-Type", "Authorization"],
+//   })
+// );
+
+
+
 app.use(
   cors({
     origin: [
       "http://localhost:5173",
       "http://localhost:3000",
       "http://127.0.0.1:5173",
+      "https://full-stack-ecomerce-virid.vercel.app",
     ],
     credentials: true,
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
+
+
 
 app.use(express.json());
 app.use(cookieParser());
@@ -540,18 +88,47 @@ app.use("/api/payment", paymentRoutes);
 // =======================
 const server = http.createServer(app);
 
+// const io = new Server(server, {
+//   cors: {
+//     origin: [
+//       "http://localhost:5173",
+//       "http://localhost:3000",
+//       "http://127.0.0.1:5173",
+//     ],
+//     credentials: true,
+//     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+//   },
+//   transports: ["polling", "websocket"],
+// });
+
+
+
+
+
+
 const io = new Server(server, {
   cors: {
     origin: [
       "http://localhost:5173",
       "http://localhost:3000",
       "http://127.0.0.1:5173",
+      "https://full-stack-ecomerce-virid.vercel.app",
     ],
     credentials: true,
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
   },
   transports: ["polling", "websocket"],
 });
+
+
+
+
+
+
+
+
+
+
 
 // Socket Instance সেট করা
 require("./config/socket").setIO(io);
