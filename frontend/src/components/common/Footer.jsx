@@ -225,17 +225,17 @@ const Footer = () => {
               <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">Email Support</span>
               
               <a 
-                href="mailto:skyrani40@gmail.com" 
+                href="mailto:manirhassan9832@gmail.com" 
                 className="text-xs text-emerald-400 hover:text-emerald-300 font-semibold block transition break-all"
               >
-                ✉️ skyrani40@gmail.com
+                ✉️ manirhassan9832@gmail.com
               </a>
 
               <a 
-                href="mailto:sksadikul676@gmail.com" 
+                href="mailto:skyrani40@gmail.com" 
                 className="text-xs text-emerald-400 hover:text-emerald-300 font-semibold block transition break-all"
               >
-                ✉️ sksadikul676@gmail.com
+                ✉️ mailto:skyrani40@gmail.com
               </a>
             </div>
 
@@ -251,9 +251,9 @@ const Footer = () => {
               </div>
 
               <div className="flex items-center justify-between text-xs bg-slate-900/80 p-2 rounded-lg border border-slate-800/80">
-                <span className="text-slate-300 font-medium">Sadikul:</span>
-                <a href="tel:7364922797" className="text-emerald-400 hover:underline font-bold">
-                  📞 7364922797
+                <span className="text-slate-300 font-medium">Rani:</span>
+                <a href="tel:9832413545" className="text-emerald-400 hover:underline font-bold">
+                  📞 9832413545
                 </a>
               </div>
             </div>
