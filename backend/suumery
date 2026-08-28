@@ -1,0 +1,233 @@
+// =====================================
+// CREATE ORDER (Updated with Live Notification)
+// =====================================
+const createOrder = async (req, res) => {
+  try {
+    const { productId, quantity, shippingAddress, paymentMethod, customerLocation } = req.body;
+
+    if (!productId || !quantity || !shippingAddress || !customerLocation) {
+      return res.status(400).json({
+        message: "Please provide all required order details",
+      });
+    }
+
+    const qty = Number(quantity);
+    if (!Number.isInteger(qty) || qty <= 0) {
+      return res.status(400).json({
+        message: "Quantity must be greater than 0",
+      });
+    }
+
+    const selectedPaymentMethod = paymentMethod === "ONLINE" ? "ONLINE" : "COD";
+
+    const customerLatitude = Number(customerLocation.latitude);
+    const customerLongitude = Number(customerLocation.longitude);
+
+    if (!Number.isFinite(customerLatitude) || !Number.isFinite(customerLongitude)) {
+      return res.status(400).json({
+        message: "Valid customer location is required",
+      });
+    }
+
+    const product = await SellerProduct.findById(productId);
+    if (!product) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    if (!product.isActive) {
+      return res.status(400).json({ message: "This product is currently unavailable" });
+    }
+
+    if (product.stock < qty) {
+      return res.status(400).json({ message: "Not enough stock available" });
+    }
+
+    const seller = await Seller.findById(product.sellerId);
+    if (!seller) {
+      return res.status(404).json({ message: "Seller not found" });
+    }
+
+    const sellerLatitude = Number(seller.location?.latitude || 22.6401);
+    const sellerLongitude = Number(seller.location?.longitude || 88.6795);
+
+    const sellingPrice = product.discountPrice > 0 ? product.discountPrice : product.price;
+    const productTotal = sellingPrice * qty;
+
+    const distanceKm = await getRoadDistance(
+      sellerLatitude,
+      sellerLongitude,
+      customerLatitude,
+      customerLongitude
+    );
+
+    const deliveryCharge = calculateDeliveryCharge(distanceKm);
+    const platformCharge = 0;
+    const deliveryBoyEarning = deliveryCharge;
+    const totalAmount = productTotal + deliveryCharge + platformCharge;
+
+    const order = await Order.create({
+      customerId: req.user.id || req.user._id,
+      sellerId: product.sellerId,
+      productId: product._id,
+      productName: product.productName,
+      quantity: qty,
+      price: sellingPrice,
+      productTotal,
+      distanceKm,
+      deliveryCharge,
+      deliveryBoyEarning,
+      platformCharge,
+      totalAmount,
+      shippingAddress,
+      paymentMethod: selectedPaymentMethod,
+      paymentStatus: "pending",
+      status: "pending",
+      sellerLocation: { latitude: sellerLatitude, longitude: sellerLongitude },
+      customerLocation: { latitude: customerLatitude, longitude: customerLongitude },
+    });
+
+    // 🔔 সেলারের কাছে রিয়েল-টাইম নোটিফিকেশন পাঠানো
+    try {
+      const io = getIO();
+      if (io && product.sellerId) {
+        io.to(`seller_${product.sellerId}`).emit("newOrderAlert", {
+          _id: order._id,
+          productName: order.productName,
+          quantity: order.quantity,
+          productTotal: order.productTotal,
+          customerName: req.user.name || "Customer",
+          message: "🔔 New Order Received!",
+        });
+      }
+    } catch (socketErr) {
+      console.warn("Socket notification error:", socketErr.message);
+    }
+
+    if (selectedPaymentMethod === "ONLINE") {
+      try {
+        const amountInPaise = Math.round(totalAmount * 100);
+        const razorpayOrder = await razorpay.orders.create({
+          amount: amountInPaise,
+          currency: "INR",
+          receipt: `order_${order._id}`,
+          payment_capture: 1,
+        });
+
+        order.razorpayOrderId = razorpayOrder.id;
+        await order.save();
+
+        return res.status(201).json({
+          message: "Order created. Proceed with online payment.",
+          order,
+          razorpayOrder: {
+            id: razorpayOrder.id,
+            amount: razorpayOrder.amount,
+            currency: razorpayOrder.currency,
+          },
+          razorpayKey: process.env.RAZORPAY_API_KEY_ID,
+        });
+      } catch (razorpayError) {
+        console.error("Razorpay Order Error:", razorpayError);
+        await Order.findByIdAndDelete(order._id);
+        return res.status(500).json({ message: "Unable to create Razorpay order" });
+      }
+    }
+
+    // COD
+    product.stock -= qty;
+    await product.save();
+
+    return res.status(201).json({
+      message: "COD order placed successfully",
+      order,
+    });
+  } catch (error) {
+    console.error("Create Order Error:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+// =====================================
+// SELLER ACCEPT ORDER & NOTIFY RIDERS + CUSTOMER
+// =====================================
+const sellerAcceptOrder = async (req, res) => {
+  try {
+    const { orderId } = req.params;
+    const sellerId = req.seller?.id || req.seller?._id;
+
+    const order = await Order.findOne({
+      _id: orderId,
+      sellerId: sellerId,
+    });
+
+    if (!order) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+
+    if (order.paymentMethod === "ONLINE" && order.paymentStatus !== "paid") {
+      return res.status(400).json({ message: "Online payment is not completed yet" });
+    }
+
+    if (order.status !== "pending") {
+      return res.status(400).json({ message: "This order cannot be accepted" });
+    }
+
+    order.status = "ready_for_shipping";
+    await order.save();
+
+    const io = getIO();
+
+    // 🔔 ১. কাস্টমারকে নোটিফিকেশন পাঠানো (Order Accepted)
+    if (io && order.customerId) {
+      io.to(`customer_${order.customerId}`).emit("orderStatusUpdated", {
+        orderId: order._id,
+        status: "ready_for_shipping",
+        message: "🏪 Your order has been accepted and is being packed!",
+      });
+    }
+
+    // ২. অনলাইন ডেলিভারি পার্টনারদের খোঁজা ও নোটিফাই করা
+    const deliveryBoys = await DeliveryBoy.find({
+      isOnline: true,
+      isAvailable: true,
+    }).select("_id name phone location");
+
+    let notifiedDeliveryBoys = 0;
+
+    const deliveryPayload = {
+      orderId: order._id,
+      _id: order._id,
+      message: "New delivery order available",
+      customerId: order.customerId,
+      productName: order.productName,
+      quantity: order.quantity,
+      productTotal: order.productTotal,
+      deliveryCharge: order.deliveryCharge,
+      deliveryBoyEarning: order.deliveryBoyEarning,
+      totalAmount: order.totalAmount,
+      distanceKm: order.distanceKm,
+      shippingAddress: order.shippingAddress,
+      customerLocation: order.customerLocation,
+      sellerLocation: order.sellerLocation,
+    };
+
+    for (const deliveryBoy of deliveryBoys) {
+      io.to(`deliveryBoy_${deliveryBoy._id}`).emit("newDeliveryOrder", deliveryPayload);
+      io.to(`deliveryBoy_${deliveryBoy._id}`).emit("orderAssigned", deliveryPayload);
+      notifiedDeliveryBoys++;
+    }
+
+    io.emit("newDeliveryOrder", deliveryPayload);
+    io.emit("orderAssigned", deliveryPayload);
+
+    res.status(200).json({
+      success: true,
+      message: "Order accepted, customer and delivery partners notified",
+      order,
+      notifiedDeliveryBoys,
+    });
+  } catch (error) {
+    console.error("Seller Accept Order Error:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
