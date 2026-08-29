@@ -1,3 +1,4 @@
+console.log("SELLER approveSeller called");
 const Seller = require("../model/seller");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");

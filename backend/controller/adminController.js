@@ -1,5 +1,5 @@
 
-
+console.log("ADMIN approveSeller called");
 const Admin = require("../model/admin");
 const Seller = require("../model/seller");
 const DeliveryBoy = require("../model/deliveryBoy");
